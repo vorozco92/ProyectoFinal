@@ -43,7 +43,7 @@ export class Products{
     }
 
     getProductById = async(id) =>{
-        let product = await productsModel.findOne({'_id': id});
+        let product = await productsModel.find({'_id': id});
         return product;
     }
 

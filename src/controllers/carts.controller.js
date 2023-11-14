@@ -38,10 +38,36 @@ const getCartById = async(req, res)=>{
 
 const addProductToCart = async(req, res)=>{
     let cartId = req.params.id;
+    let productId = req.body.productId;
+    let productQty = req.body.qty;
+    console.log(req.body);
     let cart = await cartsRepository.getCartById(cartId);
+    let newProduct = {
+        product: productId,
+        qty: productQty
+    }
     if (cart){
-        let cartBody = req.body;
-        let cartEdit = await cartsRepository.updateCartById(cartId, cartBody);
+
+        let product = await productsRepository.getProductById(productId);
+        if (! product) 
+            customError.createError({
+                name: " Error al agregar el producto, no existe",
+                cause: generateCartError(),
+                message:" Fallo al agregar el producto, no existe",
+                code: EError.INVALID_TYPES_ERROR
+            })
+        
+        let products = cart.products;
+        let pFound = products.findIndex(e =>{ console.log(productId+ ' = ' +e._id);  e._id.equals(productId)});
+        console.log(pFound);
+        if (pFound != -1 ){
+            products[pFound].qty = products[pFound].qty + productQty;
+        }
+        else{
+            products.push({product:product, qty: productQty})
+        }
+
+        let cartEdit = await cartsRepository.updateCartById(cartId,  products);
         res.send({status:'success',cart:cartEdit})
     }
     else{

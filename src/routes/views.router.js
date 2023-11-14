@@ -10,5 +10,6 @@ router.get("/resetpassword/:code", viewsController.viewResetPassword);
 router.get("/reset", viewsController.resetBtn);
 router.get("/mockingproducts", viewsController.viewMocking);
 router.get("/loggerTest", viewsController.viewLogger);
+router.get("/logout", viewsController.viewLogout);
 
 export default router;

@@ -1,4 +1,5 @@
 import { ProductsRepository } from "../repositories/Products.repository.js";
+import { CartsRepository } from "../repositories/Carts.repository.js";
 import applyPolicy from '../middleware/auth.middleware.js';
 import passport from "passport";
 import customError from '../services/errors/customError.js'
@@ -6,11 +7,13 @@ import EError from '../services/errors/enum.js'
 import { generateProductError } from '../services/errors/info.js'
 
 const productsRepository = new ProductsRepository()
+const cartsRepository = new CartsRepository()
 
 const getProducts = async(req,res)=>{
 
+    console.log('sessino:'+req.session.user)
     if (! req.session.user)
-        res.status(401).send({'status':'error', 'message': 'Unauthorized'});
+        res.status(403).send({'status':'error', 'message': 'Unauthorized'});
 
     let limit = req.query.limit ?? 10;
     let page = req.query.page ?? 1;
@@ -21,8 +24,10 @@ const getProducts = async(req,res)=>{
     let products = await productsRepository.getAllProducts(limit, page, sort, body);
     req.logger.debug(`Products ${products} at ${req.url} - ${new Date().toLocaleTimeString()}`);
 
+    let cartUser = await cartsRepository.getCartByIdUser(req.session.user.id);
+
     if (products.docs && ! products.docs.length)
-       res.send({status:'error', error:'No se obtuvieron resultados de productos'})
+       res.send({status:'error', error:'No se obtuvieron resultados de productos',has_cart : false})
     else
         res.render('products',{status:'success',
             payload:products.docs,
@@ -34,7 +39,8 @@ const getProducts = async(req,res)=>{
             hasPrevPage: products.hasPrevPage,
             prevLink: products.hasPrevPage ? req.protocol+'://'+req.get('host')+ req.baseUrl + '?sort='+sort+'&limit='+limit+'&page='+products.prevPage : null ,
             nextLink: products.hasNextPage ? req.protocol+'://'+req.get('host')+ req.baseUrl + '?sort='+sort+'&limit='+limit+'&page='+products.nextPage : null,
-            user: req.session.user
+            user: req.session.user,
+            cartId : cartUser._id
         })
 }
 

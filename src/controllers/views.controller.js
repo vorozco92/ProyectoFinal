@@ -14,6 +14,10 @@ const viewProfile = (req, res) => {
   res.render("profile", { user: req.session.user });
 };
 
+const viewLogout = async (req, res) => {
+  res.render("logout");
+};
+
 const viewResetPassword = async (req, res) => {
   const { code } = req.params.code;
 
@@ -71,4 +75,5 @@ export default{
   resetBtn,
   viewMocking,
   viewLogger,
+  viewLogout
 };

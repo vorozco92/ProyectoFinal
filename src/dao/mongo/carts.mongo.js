@@ -30,7 +30,12 @@ export class Carts{
         return cart;
     }
 
-
+    getCartByIdUser = async(user_id) =>{
+        let cart = await cartsModel.findOne({'user': user_id});
+        console.log('cart'+cart);
+        //console.log(JSON.stringify(cart, null, "\t"));
+        return cart;
+    }
     getCartByIdPopulate = async(id) =>{
         let cart = await cartsModel.findOne({'_id': id}).populate('products.product').lean();
         console.log(cart);

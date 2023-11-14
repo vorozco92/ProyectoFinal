@@ -23,6 +23,11 @@ export class CartsRepository{
         return result
     }
 
+    async getCartByIdUser(param){
+        let result = await this.dao.getCartByIdUser(param);
+        return result
+    }
+
     async getCartByIdPopulate(param){
         let result = await this.dao.getCartByIdPopulate(param);
         return result
@@ -31,6 +36,11 @@ export class CartsRepository{
     async updateCart(id,user){
         delete user._id
         let result = await this.dao.updateOne({_id:id},{$set:user})
+        return result
+    }
+
+    async updateCartById(id, products){
+        let result = await this.dao.updateCartById(id,products)
         return result
     }
 

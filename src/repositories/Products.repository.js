@@ -9,8 +9,8 @@ export class ProductsRepository{
         this.dao= productsDAO;
     }
 
-    async getAllProducts(){
-        return await this.dao.get();
+    async getAllProducts(limit, page, sort, query ){
+        return await this.dao.get(limit, page, sort, query);
     }
 
     async saveProduct(payload){
@@ -19,7 +19,7 @@ export class ProductsRepository{
     }
 
     async getProductById(param){
-        let result = await this.dao.findOne(param).lean();
+        let result = await this.dao.getProductById(param);
         return result
     }
 

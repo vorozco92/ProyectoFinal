@@ -2,11 +2,13 @@ import { createHash, generateToken ,generateLink} from "../utils/utils.js";
 import CONFIG from '../config/config.js'
 import { UsersRepository } from "../repositories/Users.repository.js";
 import { LinksRepository } from "../repositories/Links.repository.js";
+import { CartsRepository } from "../repositories/Carts.repository.js";
 import MailingService from '../services/mailing.js';
 
 
 const usersRepository =new UsersRepository()
 const linksRepository =new LinksRepository()
+const cartsRepository =new CartsRepository()
 
 const registerUser = async (req, res) => {
     const { first_name, last_name, email, age, password } = req.body;
@@ -33,14 +35,29 @@ const registerUser = async (req, res) => {
       .send({ status: "success", msj: "Te registraste correctamente" });
   }
   
-const loginUser = (req, res) => {
+const loginUser = async(req, res) => {
+
+    const user = await usersRepository.getUserById({email:req.body.email});
     const serialUser = {
-      id: req.user._id,
-      name: `${req.user.first_name}`,
-      role: req.user.role,
-      email: req.user.email,
+      id: user._id,
+      name: `${user.first_name}`,
+      role: user.role,
+      email: user.email,
     };
     req.session.user = serialUser;
+
+    //check if has cart 
+    if (user.role == 'user'){
+      let cartUser = await cartsRepository.getCartByIdUser(user._id)
+      if (! cartUser){
+        let newCart = {
+          user: user
+        }
+        let cart =  await cartsRepository.saveCart(newCart);
+       }
+    }
+
+
     const access_token = generateToken(serialUser);
     res
       .cookie("access_token", access_token, { maxAge: 36000000 })
@@ -144,7 +161,7 @@ const reset = async (req, res) => {
 
 const logout = async (req, res) => {
     if (req.session.user) req.session.destroy();
-    res.redirect("/login");
+    res.redirect("/logout");
   }
 
 const githubCallback =   async (req, res) => {

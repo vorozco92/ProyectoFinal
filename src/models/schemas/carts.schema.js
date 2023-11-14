@@ -10,14 +10,12 @@ const cartSchema = mongoose.Schema({
                 ref : 'products'
             },
             qty : {type : Number , required: true, default:1 }
-        }]
+        }],
+        default:[]
     },
     user:{
-        type: [{
-            type: mongoose.SchemaTypes.ObjectId,
-            ref: "users"
-            }
-        ],
+        type:mongoose.Schema.Types.ObjectId,
+        ref: 'users',
         default: null
     }    
 })
