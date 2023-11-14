@@ -1,0 +1,233 @@
+paths:
+  /api/products:
+    get:
+      summary: Obtiene todos los productos
+      tags:
+        - Products
+      responses:
+        "200":
+          description: Los productos se obtuvieron correctamente
+          content:
+            application/json:
+              schema: 
+                type: array
+                items:
+                  $ref: '#/components/schemas/product'
+        "500":
+          description: Hubo un error al obtener los productos
+    post:
+      summary: Creación de un producto
+      tags:
+        - Products
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/requestBodies/newProduct'
+      responses:
+        "200":
+          description: El producto se creó correctamente
+        "500":
+          description: Hubo un error
+  /api/products/:id:
+    get:
+      summary: Obtener producto por Identificador
+      tags:
+        - Products
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: Id referencia del producto
+      responses:
+        "200":
+          description: Obtiene el detalle de un producto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getProduct'
+        "500":
+          description: Hubo un error    
+    put:
+      summary: Actualizar producto
+      tags:
+        - Products
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: Id referencia del producto
+      responses:
+        "200":
+          description: Actualizar el producto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/newProduct'
+        "500":
+          description: Hubo un error
+    delete:
+      summary: Borrar producto
+      tags:
+        - Products
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: Id referencia de producto
+      responses:
+        "200":
+          description: Producto eliminado correctamente
+        "500":
+          description: Hubo un error
+ 
+#Cart
+components:
+  requestBodies:
+    newProduct:
+      type: Object 
+      properties:        
+        title:
+          type: String
+          description: Nombre del producto
+        description:
+          type: String
+          description: Descripción del producto
+        code:
+          type: String
+          description: Codigo del producto
+        price:
+          type: Number
+          description: Precio del producto
+        status:
+          type: Boolean
+          description: Estatus del producto
+        stock:
+          type: Number
+          description: Disponibilidad del producto en stock
+        category:
+          type: string
+          description: Categoria del producto
+        thumbnails:
+          type: Array
+          description: Nombre de las imagenes del producto
+        owner:
+          type: schema
+          $ref: '#/components/schemas/User'
+    getProduct:
+      type: Object 
+      properties:    
+        _id:
+          type: ObjectId
+          description: Identificador del producto
+        title:
+          type: String
+          description: Nombre del producto
+        description:
+          type: String
+          description: Descripción del producto
+        code:
+          type: String
+          description: Codigo del producto
+        price:
+          type: Number
+          description: Precio del producto
+        status:
+          type: Boolean
+          description: Estatus del producto
+        stock:
+          type: Number
+          description: Disponibilidad del producto en stock
+        category:
+          type: string
+          description: Categoria del producto
+        thumbnails:
+          type: Array
+          description: Nombre de las imagenes del producto
+        owner:
+          type: schema
+          $ref: '#/components/schemas/User'
+        
+  schemas:
+    carts:
+      type: Array
+      items:
+        $ref: '#/components/schemas/Cart'
+    Cart:     
+      type: Object
+      properties:
+        _id:  
+          type:  ObjectId
+          description: Identificador del carrito
+        products:
+          type: Array
+          _id:
+            type : ObjectId
+            description: Identificador del producto en base de datos
+          qty:
+            type: Number
+            description: Cantidad del producto en carrito
+        user:
+          _id:
+            type: String
+            description: Nombre del usuario
+      example:
+        user: ObjectId("1234abc")
+        products:
+          [ 
+            [ _id: ObjectId("453m3g3abc"),
+              qty: 1
+            ],
+            [ _id: ObjectId("032453m3gbc"),
+              qty: 5
+            ]
+          ]
+  
+    product:
+      _id:
+        type: ObjectId
+      qty:
+        type: Number 
+
+    products: 
+      type: array
+      items:
+        $ref: '#/components/schemas/product'
+
+    User:     
+      type: Object
+      properties:
+        _id:
+          type: ObjectId
+          description: Identificador del usuario
+        firts_name:
+          type: String
+          description: Nombre del usuario
+        last_name: 
+          type: String
+          description: Apellido del usuario
+        email:
+          type: string
+          description: Correo del usuario
+        password:
+          type: string
+          description: Contraseña del usuario
+        age:
+          type: Number
+          description: Edad del usuario
+        cart:
+          $ref: '#/components/schemas/Cart'
+        role:
+          type: string
+          enum: ['user', 'admin','owner']
+      example:
+        _id: ObjectId("0431234abc")
+        firts_name: Veronica
+        last_name: Orozco de Angel
+        email: demo@gmail.com
+        password: contraseña123
+        age: 23,
+        cart:  ObjectId("0431234abc")
+        role: 'user'
+      

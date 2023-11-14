@@ -1,0 +1,201 @@
+paths:
+  /api/carts:
+    get:
+      summary: Obtiene todos los carritos
+      tags:
+        - Carts
+      responses:
+        "200":
+          description: Los carritos se obtuvieron correctamente
+          content:
+            application/json:
+              schema: 
+                type: array
+                items:
+                  $ref: '#/components/schemas/Cart'
+        "500":
+          description: Hubo un error al obtener los carritos
+    post:
+      summary: Creación de carrito de compra
+      tags:
+        - Carts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/requestBodies/newCart'
+      responses:
+        "200":
+          description: El carrito se creó correctamente
+        "500":
+          description: Hubo un error
+  /api/carts/:id:
+    get:
+      summary: Obtener carrito por Identificador
+      tags:
+        - Carts
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: Id referencia de carrito
+      responses:
+        "200":
+          description: Obtiene el detalle de un carrito
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cart'
+        "500":
+          description: Hubo un error    
+    put:
+      summary: Actualizar producto de un carrito
+      tags:
+        - Carts
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: Id referencia de carrito
+      responses:
+        "200":
+          description: Actualizar el producto de un carrito
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/product'
+        "500":
+          description: Hubo un error
+    delete:
+      summary: Borrar productos de un carrito
+      tags:
+        - Carts
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: Id referencia de carrito
+      responses:
+        "200":
+          description: Producto eliminado del carrito
+        "500":
+          description: Hubo un error
+  /api/carts/:id/purchase:
+    post:
+      summary: Crear una compra del carrito
+      tags:
+        - Carts
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: Id referencia de carrito
+      responses:
+        "200":
+          description: La compra se realizo correctamentes
+        "500":
+          description: Hubo un error  
+  /api/carts/:id/products/:id:
+    put:
+      summary: Actualizar cantidad de un producto en carrito
+      tags:
+        - Carts
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: Id referencia de carrito
+      - name: pid
+        in: path
+        required: true
+        description: Id referencia del producto
+      responses:
+        "200":
+          description: Producto actualizado correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/product'
+        "400":
+          description: El carrito / producto no existe
+        "500":
+          description: Hubo un error
+    delete:
+      summary: Borrar producto de un carrito
+      tags:
+        - Carts
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: Id referencia de carrito
+      - name: pid
+        in: path
+        required: true
+        description: Id referencia del producto
+      responses:
+        "200":
+          description: Producto eliminado del carrito
+        "500":
+          description: Hubo un error
+#Cart
+components:
+  requestBodies:
+    newCart:
+      type: Object 
+      properties:        
+        products:
+          type: Array 
+          items:
+            $ref: '#/components/schemas/product'        
+      example:
+        products:
+          _id: ObjectId("453m3g3adc"),
+          qty: 10
+        
+  schemas:
+    carts:
+      type: Array
+      items:
+        $ref: '#/components/schemas/Cart'
+    Cart:     
+      type: Object
+      properties:
+        _id:  
+          type:  ObjectId
+          description: Identificador del carrito
+        products:
+          type: Array
+          _id:
+            type : ObjectId
+            description: Identificador del producto en base de datos
+          qty:
+            type: Number
+            description: Cantidad del producto en carrito
+        user:
+          _id:
+            type: String
+            description: Nombre del usuario
+      example:
+        user: ObjectId("1234abc")
+        products:
+          [ 
+            [ _id: ObjectId("453m3g3abc"),
+              qty: 1
+            ],
+            [ _id: ObjectId("032453m3gbc"),
+              qty: 5
+            ]
+          ]
+  
+    product:
+      _id:
+        type: ObjectId
+      qty:
+        type: Number 
+
+    products: 
+      type: array
+      items:
+        $ref: '#/components/schemas/product'
