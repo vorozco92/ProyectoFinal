@@ -12,6 +12,6 @@ router.delete('/:id', cartsController.deleteProductsInCart)
 router.post('/:id', cartsController.addProductToCart)
 router.delete('/:id/products/:pid', cartsController.deleteProductInCart)
 router.put('/:id/products/:pid', cartsController.updateProductInCart)
-router.post('/:id/purchase', cartsController.addPurchase)
+router.post('/:id/purchase', applyPolicy(['USER']),cartsController.addPurchase)
 
 export default router;

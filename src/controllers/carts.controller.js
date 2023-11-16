@@ -4,6 +4,7 @@ import { TicketsRepository } from "../repositories/Tickets.repository.js";
 import customError from '../services/errors/customError.js'
 import EError from '../services/errors/enum.js'
 import { generateCartError } from '../services/errors/info.js'
+import MailingService from '../services/mailing.js';
 
 const cartsRepository = new CartsRepository()
 const productsRepository = new ProductsRepository()
@@ -32,7 +33,7 @@ const getCartById = async(req, res)=>{
     let cart = await cartsRepository.getCartByIdLean(cartId);
     let total = 0;
     if (cart){
-       // console.log(cart.products)
+        //console.log(cart.products)
         cart.products.forEach( prod =>{ let subtotal = (prod.product.price * prod.qty); prod.subtotal = subtotal;  total += subtotal});
         res.render('carts',{status:'success','total': total, 'cartId': cart._id,products:cart.products})}
     else
@@ -84,7 +85,7 @@ const addProductToCart = async(req, res)=>{
 const deleteProductInCart =async(req, res)=>{
     let cartId = req.params.id;
     let productId = req.params.pid;
-    console.log('cid'+cartId+' pid:'+productId);
+    //console.log('cid'+cartId+' pid:'+productId);
     let cart = await cartsRepository.getCartById(cartId);
     let cartEdit = false; 
     if (cart){
@@ -124,45 +125,70 @@ const deleteProductsInCart = async(req, res)=>{
 
 const addPurchase =async(req, res)=>{
     let cartId = req.params.id;
-    let cart = await cartsRepository.getCartByIdPopulate(cartId);
+    let cart = await cartsRepository.getCartByIdLean(cartId);
     if (!cart)    
         res.send({status:'error','error_description':`carrito con Id ${cartId} no fue encontrado.`})
 
-    if (! cart.products)
+    if (! cart.products.length)
         res.send({status:'error','error_description':`carrito no contiene productos.`})
 
-    let stockDeficit, productsNotExists = [];
+    let stockDeficit=[], productsNotExists = [],productsDelete = [];
     let totalAmount = 0;
-    cart.products.forEach(product => {
-        let productStorage = productsRepository.getProductById(product._id);
+    cart.products.forEach(product =>{
 
-        if (productStorage){
-            if (productStorage.quanity < product.qty)
-                stockDeficit.push(product._id)
+        if (product){
+            let stock = product.product.stock;
+            if (stock < product.qty)
+                stockDeficit.push(product.product._id)
             else{
-                productStorage.quanity = productStorage.quanity - product.qty;
-                totalAmount += ( product.qty * productStorage.price);
+                let newQuanity = parseInt(stock) - parseInt(product.qty);
+                totalAmount += ( parseInt(product.qty) * parseFloat(product.product.price));
+                productsDelete.push(product.product._id);
+                cartsRepository.deleteProductInCartById(cartId, product.product._id);
+                productsRepository.updateProduct(String(product.product._id), {'stock': newQuanity});
             }
         }
         else
-            productsNotExists.push(product._id);
+            productsNotExists.push(String(product.product._id));
 
     });
 
-    if (! totalAmount)
-        res.send({status:'error','error_description':`carrito no contiene productos.`})
+   console.log('STOKC DEFICIT')
+   console.log(stockDeficit)
+   console.log('SproductsNotExists')
+   console.log(productsNotExists)
+   console.log(productsDelete);
 
-    let uID = Math.random(10000);
+    let uID = Math.random(10000).toString();
+    uID = uID.replace('.','');
     let newTicket = {
         code: uID.padStart((12 - uID.length), '0'),
         amount : totalAmount,
-        purcharser: req.session.email,
-
+        purchaser: req.session.user.email,
+        purchase_datetime: new Date().toLocaleDateString()+ ' '+new Date().toLocaleTimeString()
     }
 
     let ticketResult = await ticketsRepository.saveTicket(newTicket);
     
-    res.render('carts',{status:'success',ticket: ticketResult})
+    if (ticketResult){
+        const mailer = new MailingService();
+        const result = await mailer.sendSimpleMail({
+            from:'Ecommerce',
+            to: req.session.user.email,
+            subject:"Compra exitosa",
+            html:`<div><h1>Hola ${req.session.user.name}!</h1>
+            <br>
+            <p> Tu ticket de compra es: <b>${ticketResult.code}</b></p>
+            <p>Total compra : <b>$ ${totalAmount}</b></p>
+            <br>
+            <h4>!Gracias por tu compra!</h4>
+            </div>`
+        })
+
+        res.status(200).send({status:'success',ticket: ticketResult})
+    }
+    else
+        res.status(500).send({status:'error', error_message: 'Sucedio un error al procesar la compra.'})
        
 }
 

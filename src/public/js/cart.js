@@ -51,3 +51,51 @@ form[i].addEventListener('submit', e =>{
 
 })
 }
+
+const formCart =document.getElementById('formCart')
+formCart.addEventListener('submit', e =>{
+    e.preventDefault();
+   
+    const data= new FormData(formCart);
+    const obj={}
+    data.forEach((value,key)=>obj[key]=value);
+
+    console.log('/api/carts/'+cartId+'/purchase')
+    fetch('/api/carts/'+cartId+'/purchase',{
+        method:'POST',
+        headers:{
+            'Content-Type':'application/json'
+        }
+    }).then(result=>{
+        if(result.status===200){
+            
+            Swal.fire({
+                'title': 'La compra se realizo existosamente.',
+                'icon' : 'success'
+            });
+            window.location.replace('/api/carts/'+cartId)
+        }
+        else{
+            Swal.fire({
+                'title': 'Ocurrio un error en la eliminación.',
+                'icon' : 'error'
+            });
+        }
+
+        
+    }).catch(error => {
+
+        console.error('Error en la solicitud:', error.message);
+    
+        Swal.fire({
+    
+          title: 'Ocurrió un error al procesar la solicitud.',
+    
+          icon: 'error'
+    
+        });
+    
+      });
+
+
+})

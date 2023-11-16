@@ -2,7 +2,13 @@
     <h2>Mi carrito</h2>
     <input type="hidden" value="{{cartId}}" name="cartId" id="cartId">
     <br><br>
-    <a href="/api/products/">Ver productos</a>
+    <a href="/api/products/">Ver más Productos</a>
+    {{#if products.length}}
+    <form method="POST" id="formCart">
+        <button class="button rigth blue" type="submit">Pagar carrito</button>
+    </form>
+    <br><br>
+    {{/if}}
     <table id="listTable">
         <tr>
             <!--<th>ID</th>-->

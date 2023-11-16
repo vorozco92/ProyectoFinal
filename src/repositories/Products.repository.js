@@ -25,7 +25,7 @@ export class ProductsRepository{
 
     async updateProduct(id, product){
         delete product._id
-        let result = await this.dao.updateOne({_id:id},{$set:product})
+        let result = await this.dao.updateProductById(id, product)
         return result
     }
 

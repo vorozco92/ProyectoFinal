@@ -62,6 +62,23 @@ table tr:last-of-type {
 	background:#037E8C;
 }
 
+.blue {
+	background:#037E8C;
+}
+
+.button {
+	color: white;
+	font-size: large;
+	background:#037E8C;
+	padding: 5px 10px;
+}
+
+.rigth {
+	float: right;
+} 
+
+
+
 .paginacion ul li .active {
 	background: #009879;
 	font-weight:bold;
