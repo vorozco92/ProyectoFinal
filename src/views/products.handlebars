@@ -5,7 +5,7 @@
     <h2>Listado de Productos</h2>
 
     <h5 style="text-align:right" >Bienvenido {{user.name}},  (Rol:{{#if user.role }} {{user.role}} {{else}} usuario{{/if}}) {{user.email}}</h5>
-    
+    <a href="/api/carts/{{cartId}}">Ir a carrito</a>
     <!--<div>
         <h1>ChatBox </h1>
         <input id="chatBox">   
@@ -51,11 +51,11 @@
                 <td>&nbsp;</td>
             {{/if}}
             <td>
-                <form class="addForm">
+                <form class="addForm" id="formCart_{{this._id}}Form">
                     <label>Cantidad</label>
                     <input type="number" name="qty" value="1"  min="1" max="{{this.stock}}">
                     <input type="hidden" name="productId" value="{{this._id}}">
-                    <button type="submit">Agregar a carrito</button>
+                    <button type="submit" id="formCart_{{this._id}}">Agregar a carrito</button>
                 </form>
             </td>
         </tr>

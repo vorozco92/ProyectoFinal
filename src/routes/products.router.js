@@ -6,7 +6,7 @@ const router = Router();
 
 //router.use(passport.authenticate('api/sessions/current',{session:false}))
 
-router.get('/', productsController.getProducts)
+router.get('/', applyPolicy(['USER']), productsController.getProducts)
 router.post('/', productsController.addProduct)
 router.get('/:id', productsController.getProductById)
 router.put('/:id', applyPolicy(['ADMIN']), productsController.updateProduct)

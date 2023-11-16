@@ -14,16 +14,18 @@ let chatBox = document.getElementById("chatBox");
     socket.emit("newUser",{user});
 });
 */
-chatBox.addEventListener("keyup",(evt)=>{
-    if (evt.key === "Enter"){
-        if (chatBox.value.trim().length > 0){
-            console.log('user:'+user);
-            socket.emit("message",{user:user, message:chatBox.value});
-            chatBox.value ="";
+if (chatBox){
+    chatBox.addEventListener("keyup",(evt)=>{
+        if (evt.key === "Enter"){
+            if (chatBox.value.trim().length > 0){
+                console.log('user:'+user);
+                socket.emit("message",{user:user, message:chatBox.value});
+                chatBox.value ="";
+            }
         }
-    }
-    return;
-});
+        return;
+    });
+}
 
 socket.on('messagesLogs',data=>{
     let log =document.getElementById('messageLogs');

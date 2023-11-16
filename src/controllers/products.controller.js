@@ -11,9 +11,9 @@ const cartsRepository = new CartsRepository()
 
 const getProducts = async(req,res)=>{
 
-    console.log('sessino:'+req.session.user)
-    if (! req.session.user)
-        res.status(403).send({'status':'error', 'message': 'Unauthorized'});
+    //console.log('sessino:'+req.session.user)
+    //if (! req.session.user)
+      //  res.status(403).send({'status':'error', 'message': 'Unauthorized'});
 
     let limit = req.query.limit ?? 10;
     let page = req.query.page ?? 1;

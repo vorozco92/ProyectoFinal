@@ -24,20 +24,23 @@ export class Carts{
     }
 
     getCartById = async(id) =>{
-        let cart = await cartsModel.findOne({'_id': id});
-        console.log('cart'+cart);
-        //console.log(JSON.stringify(cart, null, "\t"));
+        let cart = await cartsModel.findOne({'_id': id}).populate('products.product');
+        return cart;
+    }
+
+    getCartByIdLean = async(id) =>{
+        let cart = await cartsModel.findOne({'_id': id}).populate('products.product').lean();
         return cart;
     }
 
     getCartByIdUser = async(user_id) =>{
-        let cart = await cartsModel.findOne({'user': user_id});
+        let cart = await cartsModel.findOne({'user': user_id}).populate('products');
         console.log('cart'+cart);
         //console.log(JSON.stringify(cart, null, "\t"));
         return cart;
     }
     getCartByIdPopulate = async(id) =>{
-        let cart = await cartsModel.findOne({'_id': id}).populate('products.product').lean();
+        let cart = await cartsModel.findOne({'_id': id}).populate('products');
         console.log(cart);
         //console.log(JSON.stringify(cart, null, "\t"));
         return cart;
@@ -51,20 +54,20 @@ export class Carts{
     }
 
     deleteProductInCartById = async(cartId,productId) =>{
-        let cart = await cartsModel.findOne({'_id': cartId})
+        
+        let cart = await this.getCartById(cartId)
         if (cart){
+            //console.log('cart_-->'+cart);
             let products = cart.products;
-            let pIndex  = products.findIndex(prod => parseInt(prod._id) === parseInt(productId));
+            let pIndex = products.findIndex(e =>{ return (String(e.product._id) === String(productId));});
             if (pIndex !== -1){
                 products.splice(pIndex, 1)
-                let cartUpdate = {
-                    _id: cartId,
-                    products: products
-                }
-                cart = await cartsModel.updateOne({_id: cartId}, cartUpdate);
-            }      
+                cart = await cartsModel.updateOne({_id: cartId}, {products: products});
+                return true;
+            }
+                
         }
-        return cart;
+        return false;
     }
 
     updateProductInCartById = async(cartId,productId, qty) =>{

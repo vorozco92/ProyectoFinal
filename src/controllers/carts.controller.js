@@ -29,9 +29,12 @@ const createCart = async(req,res)=>{
 const getCartById = async(req, res)=>{
     let cartId = req.params.id;
     req.logger.debug(`cartId ${cartId} at ${req.url} - ${new Date().toLocaleTimeString()}`);
-    let cart = await cartsRepository.getCartById(cartId);
-    if (cart)
-        res.render('carts',{status:'success',products:cart.products})
+    let cart = await cartsRepository.getCartByIdLean(cartId);
+    let total = 0;
+    if (cart){
+       // console.log(cart.products)
+        cart.products.forEach( prod =>{ let subtotal = (prod.product.price * prod.qty); prod.subtotal = subtotal;  total += subtotal});
+        res.render('carts',{status:'success','total': total, 'cartId': cart._id,products:cart.products})}
     else
         res.status(401).send({status:'error','error_description':`carrito con Id ${cartId} no fue encontrado.`})
 }
@@ -40,12 +43,9 @@ const addProductToCart = async(req, res)=>{
     let cartId = req.params.id;
     let productId = req.body.productId;
     let productQty = req.body.qty;
-    console.log(req.body);
+    //console.log(req.body);
     let cart = await cartsRepository.getCartById(cartId);
-    let newProduct = {
-        product: productId,
-        qty: productQty
-    }
+
     if (cart){
 
         let product = await productsRepository.getProductById(productId);
@@ -58,13 +58,13 @@ const addProductToCart = async(req, res)=>{
             })
         
         let products = cart.products;
-        let pFound = products.findIndex(e =>{ console.log(productId+ ' = ' +e._id);  e._id.equals(productId)});
-        console.log(pFound);
-        if (pFound != -1 ){
-            products[pFound].qty = products[pFound].qty + productQty;
+        let pFound = products.findIndex(e =>{ /*console.log(String(e.product._id)+' == '+String(productId));*/  return (String(e.product._id) === String(productId));});
+        //console.log(pFound);
+        if (pFound !== -1){
+            products[pFound].qty = parseInt(products[pFound].qty) + parseInt(productQty);
         }
         else{
-            products.push({product:product, qty: productQty})
+            products.push({'product':`${productId}`, 'qty': productQty})
         }
 
         let cartEdit = await cartsRepository.updateCartById(cartId,  products);
@@ -84,13 +84,18 @@ const addProductToCart = async(req, res)=>{
 const deleteProductInCart =async(req, res)=>{
     let cartId = req.params.id;
     let productId = req.params.pid;
+    console.log('cid'+cartId+' pid:'+productId);
     let cart = await cartsRepository.getCartById(cartId);
+    let cartEdit = false; 
     if (cart){
+        
         let cartEdit = await cartsRepository.deleteProductInCartById(cartId, productId);
-        res.send({status:'success', cart: cartEdit});
+        if (cartEdit)
+            res.status(200).send({status:'success', cart: cartEdit});
+        else
+            res.status(500).send({status:'error','error_description':`Error al eliminar el producto.`})
     }
-    else
-        res.send({status:'error','error_description':`carrito con Id ${cartId} no fue encontrado.`})
+        
 }
 
 const updateProductInCart = async(req, res)=>{

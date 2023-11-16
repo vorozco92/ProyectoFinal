@@ -1,37 +1,34 @@
-const form =document.getElementsByClassName('addForm')
+const form =document.getElementsByClassName('removeForm')
 const cartId = document.getElementById('cartId').value;
 
 for (var i = 0; i <form.length; i++) {
 form[i].addEventListener('submit', e =>{
     e.preventDefault();
-
    
     const formO =document.getElementById(e.target.id);
     console.log(e.target.id);
     const data= new FormData(formO);
     const obj={}
     data.forEach((value,key)=>obj[key]=value);
-    console.log(obj);
 
-
-    fetch('/api/carts/'+cartId,{
-        method:'POST',
-        body:JSON.stringify(obj),
+    console.log('/api/carts/'+cartId+'/products/'+obj.product_id)
+    fetch('/api/carts/'+cartId+'/products/'+obj.product_id,{
+        method:'DELETE',
         headers:{
             'Content-Type':'application/json'
         }
     }).then(result=>{
         if(result.status===200){
-            console.log(result)
+            document.getElementById("rowNo"+obj.product_id).style.display = 'none';
             Swal.fire({
-                'title': 'El producto se agrego existosamente.',
+                'title': 'El producto se elimino existosamente.',
                 'icon' : 'success'
             });
             //window.location.replace('/api/products/')
         }
         else{
             Swal.fire({
-                'title': 'El correo y/o la contraseña son incorrectos.',
+                'title': 'Ocurrio un error en la eliminación.',
                 'icon' : 'error'
             });
         }

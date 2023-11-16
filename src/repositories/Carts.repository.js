@@ -23,6 +23,11 @@ export class CartsRepository{
         return result
     }
 
+    async getCartByIdLean(param){
+        let result = await this.dao.getCartByIdLean(param);
+        return result
+    }
+
     async getCartByIdUser(param){
         let result = await this.dao.getCartByIdUser(param);
         return result
@@ -41,6 +46,11 @@ export class CartsRepository{
 
     async updateCartById(id, products){
         let result = await this.dao.updateCartById(id,products)
+        return result
+    }
+
+    async deleteProductInCartById(cid, pid){
+        let result = await this.dao.deleteProductInCartById(cid,pid)
         return result
     }
 

@@ -38,11 +38,8 @@ const productSchema = mongoose.Schema({
         default: []
     },
     owner:{
-        type: [{
-            type: mongoose.SchemaTypes.ObjectId,
-            ref: "users"
-            }
-        ],
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "users",
         default: null
     } 
 })

@@ -1,31 +1,32 @@
 <div>
-    <h2>Listado de Productos del carrito</h2>
+    <h2>Mi carrito</h2>
+    <input type="hidden" value="{{cartId}}" name="cartId" id="cartId">
+    <br><br>
+    <a href="/api/products/">Ver productos</a>
     <table id="listTable">
         <tr>
-            <th>ID</th>
+            <!--<th>ID</th>-->
             <th>Titulo</th>
             <th>Descripción</th>
             <th>Código</th>
-            <th>Precio</th>
-            <th>Estatus</th>
-            <th>Stock</th>
+            <th>Precio Unitario</th>
+            <th>Cantidad</th>
+            <th>Precio total</th>
             <th>Categoria</th>
             <th>Imagenes</th>
             <th>Acciones</th>
         </tr>
+    
     {{#each products}}
+    
         <tr id="rowNo{{this.product._id}}">
-            <td>{{this.product._id}}</td>
+            <!--<td>{{this.product._id}}</td>-->
             <td>{{this.product.title}}</td>
             <td>{{this.product.description}}</td>
             <td>{{this.product.code}}</td>
-            <td>${{this.product.price}}</td>
-            {{#if this.product.status}}
-                <td class="green">Activo</td>
-            {{else}}
-                <td class="red">Inactivo</td>
-            {{/if}}
-            <td>{{this.product.stock}}</td>
+            <td>$ {{this.product.price}}</td> 
+            <td>{{this.qty}}</td>
+            <td>$ {{this.subtotal}}</td>
             <td>{{this.product.category}}</td>
             {{#if this.product.thumbnails.length}}
                 <td>
@@ -37,15 +38,25 @@
                 <td>&nbsp;</td>
             {{/if}}
             <td>
-                <form class="addForm">
-                    <input type="hidden" name="product_id" value="{{this._id}}">
-                    <button type="submit">Agregar a carrito</button>
+                <form class="removeForm" id="formProd_{{this.product._id}}Form">
+                    <input type="hidden" name="product_id" value="{{this.product._id}}">
+                    <button type="submit" id="formProd_{{this.product._id}}" >Eliminar producto</button>
                 </form>
             </td>
         </tr>
     {{/each}}
+    <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>Total a pagar:</td>
+        <td>$ {{total}}</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+    </tr>
     </table>
 </div>
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="/socket.io/socket.io.js"></script>
-<script src="../../js/index.js"></script>
+<script src="../../js/cart.js"></script>
